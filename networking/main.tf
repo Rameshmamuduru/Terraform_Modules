@@ -46,3 +46,32 @@ resource "aws_subnet" "database" {
     }
   
 }
+
+## Internet Gateway
+resource "aws_internet_gateway" "this" {
+    vpc_id = aws_vpc.this.id
+    tags = {
+        Name = "main-igw"
+    }
+}
+
+resource "aws_eip" "nat" {
+    for_each = var.nat_type == "single" ? { (var.single_nat_az) = local.public_subnet[var.single_nat_az] } : local.public_subnet
+
+    domain = "vpc"
+
+    tags = {
+        Name = "nat-eip-${each.key}"
+    }   
+}
+
+resource "aws_nat_gateway" "this" {
+    for_each = var.nat_type == "single" ? { (var.single_nat_az) = local.public_subnet[var.single_nat_az] } : { for idx, az in var.azs : az => local.public_subnet[az] }
+
+    allocation_id = aws_eip.nat[each.key].id
+    subnet_id = aws_subnet.public[each.key].id
+    tags = {
+        Name = "nat-gateway-${each.key}"
+    }
+  
+}
