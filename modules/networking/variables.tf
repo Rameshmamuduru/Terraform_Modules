@@ -4,12 +4,12 @@ variable "vpc_cidr" {
 }
 
 variable "azs" {
-    type = list(string)
+    type = map(string)
     description = "List of availability zones"
 }
 
 variable "public_subnet_cidrs" {
-    type = list(string)
+    type = map(string)
     description = "List of CIDR blocks for public subnets"
 
     validation {
@@ -19,7 +19,7 @@ variable "public_subnet_cidrs" {
 }
 
 variable "private_subnet_cidrs" {
-    type = list(string)
+    type = map(string)
     description = "List of CIDR blocks for private subnets"
 
     validation {
@@ -29,7 +29,7 @@ variable "private_subnet_cidrs" {
 }
 
 variable "database_subnet_cidrs" {
-    type = list(string)
+    type = map(string)
     description = "List of CIDR blocks for database subnets"
     default = [ ]
 
@@ -59,7 +59,7 @@ variable "single_nat_az" {
 
   validation {
     condition = (
-        var.sinle_nat_az == null || contains (var.azs, var.single_nat_azs)
+        var.single_nat_az == null || contains (var.azs, var.single_nat_az)
     )
     error_message = "single nat must exsist in azs"
   }

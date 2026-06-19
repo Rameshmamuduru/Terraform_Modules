@@ -24,7 +24,6 @@ variable "security_group_ingress_rules" {
     cidr_blocks = list(string)
     description = string
   }))
-  default = []
   
 }
 
@@ -37,6 +36,5 @@ variable "security_group_egress_rules" {
     cidr_blocks = list(string)
     description = string
   }))
-  default = []
   
 }
