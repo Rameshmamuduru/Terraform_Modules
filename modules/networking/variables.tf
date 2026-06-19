@@ -31,7 +31,6 @@ variable "private_subnet_cidrs" {
 variable "database_subnet_cidrs" {
     type = map(string)
     description = "List of CIDR blocks for database subnets"
-    default = [ ]
 
     validation {
       condition = (
