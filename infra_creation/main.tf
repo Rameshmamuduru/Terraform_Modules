@@ -1,7 +1,8 @@
 module "networking" {
-  source = "./modules/networking"
+  source = "../modules/networking"
 
   vpc_cidr = var.vpc_cidr
+  nat_type = "single"
 
   azs = ["us-east-1a", "us-east-1b", "us-east-1c"]
 
@@ -12,14 +13,14 @@ module "networking" {
 }
 
 module "security_groups" {
-  source = "./modules/security_groups"
+  source = "../modules/security_groups"
 
   vpc_id = module.networking.vpc_id
 
   name = var.security_group_name
   description = var.security_group_description
-  ingress_rules = var.security_group_ingress_rules
-  egress_rules = var.security_group_egress_rules 
+    ingress_rules = var.security_group_ingress_rules
+    egress_rules = var.security_group_egress_rules
  
 }
 

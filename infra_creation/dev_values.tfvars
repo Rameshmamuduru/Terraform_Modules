@@ -47,6 +47,7 @@ security_group_ingress_rules = {
         description = "Allow all outbound traffic"
       }
     ]
+  } 
 
 }
 
