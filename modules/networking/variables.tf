@@ -6,11 +6,13 @@ variable "vpc_cidr" {
 variable "azs" {
     type = map(string)
     description = "List of availability zones"
+    default = {}
 }
 
 variable "public_subnet_cidrs" {
     type = map(string)
     description = "List of CIDR blocks for public subnets"
+    default = {}
 
     validation {
       condition = length(var.public_subnet_cidrs) == length(var.azs)
@@ -21,6 +23,7 @@ variable "public_subnet_cidrs" {
 variable "private_subnet_cidrs" {
     type = map(string)
     description = "List of CIDR blocks for private subnets"
+    default = {}
 
     validation {
       condition = length(var.private_subnet_cidrs) == length(var.azs)
@@ -31,7 +34,7 @@ variable "private_subnet_cidrs" {
 variable "database_subnet_cidrs" {
     type = map(string)
     description = "List of CIDR blocks for database subnets"
-    default = []
+    default = {}
 
     validation {
       condition = (
