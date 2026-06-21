@@ -65,7 +65,7 @@ resource "aws_nat_gateway" "this" {
         var.enable_nat_gateway ? local.nat_gateway_subnets : {}
     ) 
 
-    allocation_id = aws_eip.nat[each.key].subnet_id
+    allocation_id = aws_eip.nat[each.key].subnet.id
     subnet_id = each.value
 
     depends_on = [
