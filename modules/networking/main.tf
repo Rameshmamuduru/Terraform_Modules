@@ -1,4 +1,4 @@
-## vpc resouce block
+## vpc resource block
 
 resource "aws_vpc" "this" {
     cidr_block = var.vpc_cidr
@@ -39,16 +39,28 @@ locals {
     subnet.id if subnet.map_public_ip_on_launch == true
   ]
 
-nat_gateway_subnets = (
-  var.nat_gateway_strategy == "single" ?
-  {
-      nat1 = local.public_subnet_ids[0]
-  } :
-  {
-      for idx, subnet_id in local.public_subnet_ids :
-      "nat${idx + 1}" => subnet_id
+  nat_gateway_subnets = (
+    var.nat_gateway_strategy == "single" ?
+    {
+        nat1 = local.public_subnet_ids[0]
+    } :
+    {
+        for idx, subnet_id in local.public_subnet_ids :
+        "nat${idx + 1}" => subnet_id
+    }
+  )
+
+  public_subnet_by_az = {
+    for k, v in aws_subnet.this :
+    v.availability_zone => v.id
+    if v.map_public_ip_on_launch == true
   }
-)
+
+  private_subnet_by_az = {
+    for k, v in aws_subnet.this :
+    v.availability_zone => v.id
+    if v.map_public_ip_on_launch == false
+  }
 }
 
 resource "aws_eip" "nat" {
@@ -65,7 +77,7 @@ resource "aws_nat_gateway" "this" {
         var.enable_nat_gateway ? local.nat_gateway_subnets : {}
     ) 
 
-    allocation_id = aws_eip.nat.subnet[each.key].id
+    allocation_id = aws_eip.nat[each.key].id
     subnet_id = each.value
 
     depends_on = [
