@@ -39,15 +39,15 @@ locals {
     subnet.id if subnet.map_public_ip_on_launch == true
   ]
 
-  nat_gateway_subnets = (
-    var.nat_gateway_stratagy== "single" ?
-    {
-        nat1 = local.public_subnet_ids[0]
-    } :
-    {
-        for idx, subnet_id in local.public_subnet_ids :
-        "nat${idx + 1}" => subnet_id
-    }
+nat_gateway_subnets = (
+  var.nat_gateway_strategy == "single" ?
+  {
+      nat1 = local.public_subnet_ids[0]
+  } :
+  {
+      for idx, subnet_id in local.public_subnet_ids :
+      "nat${idx + 1}" => subnet_id
+  }
 )
 }
 
