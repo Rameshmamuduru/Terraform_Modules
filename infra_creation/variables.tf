@@ -40,7 +40,7 @@ variable "enable_nat_gateway" {
   
 }
 
-variable "nat_gateway_stratagy" {
+variable "nat_gateway_strategy  " {
 
   description = "single or one_per_az"
   type = string
@@ -48,7 +48,7 @@ variable "nat_gateway_stratagy" {
 
   validation {
     condition = contains(
-      ["single", "one_per_az"], var.nat_gateway_stratagy
+      ["single", "one_per_az"], var.nat_gateway_strategy  
     )
 
     error_message = "allowed values are single or one_per_az"

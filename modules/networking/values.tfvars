@@ -49,4 +49,4 @@ subnets = {
 
 enable_nat_gateway  = true
 
-nat_gateway_strategy = "single"
+nat_gateway_strategy   = "single"
