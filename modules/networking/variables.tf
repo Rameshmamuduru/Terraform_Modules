@@ -40,7 +40,7 @@ variable "enable_nat_gateway" {
   
 }
 
-variable "nat_gateway_startagy" {
+variable "nat_gateway_stratagy" {
 
   description = "single or one_per_az"
   type = string

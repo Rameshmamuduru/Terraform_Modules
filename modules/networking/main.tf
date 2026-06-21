@@ -40,7 +40,7 @@ locals {
   ]
 
   nat_gateway_subnets = (
-    var.nat_gateway_startagy == "single" ?
+    var.nat_gateway_stratagy== "single" ?
     {
         nat1 = local.public_subnet_ids[0]
     } :
