@@ -1,40 +1,57 @@
 variable "vpc_cidr" {
-  description = "The CIDR block for the VPC"
-  type        = string
+    type = string
+    description = "CIDR block for VPC" 
 }
 
-variable "security_group_name" {
-  description = "Name of the security group"
-  type        = string
+variable "subnets" {
+    type = map(object({
+      cidr_block = string
+      az = string
+      subnet_type = bool
+
+    }))
+
+    validation {
+      condition = alltrue([
+        for subnet in values(var.subnets) :
+        can(cidrhost(subnet.cidr, 0))
+      ])
+      error_message = "all subnet CIDR must be in valid range"
+    }
+
+    validation {
+      condition = alltrue([
+        for subnet in values(var.subnets) :
+        contains(
+          ["public", "private", "database"], lower(subnet.subnet_type)
+        )
+      ])
+      error_message = "subnet type must be in public, private or database"
+    }
+}
+
+## IGW and NAT variables
+
+variable "enable_nat_gateway" {
+
+  description = "Enable NAT for PROD, in all the azs"
+  type = bool
+  default = true
   
 }
 
-variable "security_group_description" {
-  description = "Description of the security group"
-  type        = string
-  
-}
+variable "nat_gateway_startagy" {
 
-variable "security_group_ingress_rules" {
-  description = "List of ingress rules for the security group"
-  type = map(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
-    description = string
-  }))
-  
-}
+  description = "single or one_per_az"
+  type = string
+  default = "single"
 
-variable "security_group_egress_rules" {
-  description = "List of egress rules for the security group"
-  type = map(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
-    description = string
-  }))
+  validation {
+    condition = contains(
+      ["single", "one_per_az"], var.nat_gateway_stratagy
+    )
+
+    error_message = "allowed values are single or one_per_az"
+  }
   
 }

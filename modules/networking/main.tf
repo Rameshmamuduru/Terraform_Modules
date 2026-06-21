@@ -73,3 +73,44 @@ resource "aws_nat_gateway" "this" {
   ]
   
 }
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.this.id
+}
+
+resource "aws_route" "public_internet" {
+  route_table_id = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.this.id
+}
+
+resource "aws_route_table_association" "public" {
+    for_each = {
+        for k, v in aws_subnet.this :
+        k => v
+        if var.subnets[k].subnet_type == "public"
+    }
+
+    subnet_id = each.value.id
+    route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table" "private" {
+  for_each = local.public_subnet_by_az
+
+  vpc_id = aws_vpc.this.id
+
+}
+
+resource "aws_route" "private_route" {
+  for_each = local.private_subnet_by_az
+  route_table_id = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id = aws_nat_gateway.this[each.key].id
+}
+
+resource "aws_route_table_association" "private" {
+  for_each = local.private_subnet_by_az
+  subnet_id = each.value
+  route_table_id = aws_route_table.private[each.key].id
+}

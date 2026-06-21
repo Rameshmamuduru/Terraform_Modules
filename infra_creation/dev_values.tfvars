@@ -1,53 +1,52 @@
 vpc_cidr = "10.0.0.0/16"
-security_group_name = "my-security-group"
-security_group_description = "Security group for my application"
 
-security_group_ingress_rules = {
-  external_alb = {
+subnets = {
+  public_subnet_1 = {
+
+    public_subnet_cidr = "10.0.1.0/24"
+    az = "us-east-1a"
+    subnet_type = public
     
-    description = "Allow HTTP and HTTPS traffic from the internet"
-
-    ingress_rules = [
-      {
-        from_port   = 80
-        to_port     = 80
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-        description = "Allow HTTP traffic from anywhere"
-      },
-      {
-        from_port   = 443
-        to_port     = 443
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-        description = "Allow HTTPS traffic from anywhere"
-      }
-    ]
-
-    egress_rules = [
-      {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-        description = "Allow all outbound traffic"
-      }
-    ]
   }
 
-  web_sg = {
-    description = "Allow traffic from the external ALB security group"
+  public_subnet_2 = {
+    public_subnet_cidr = "10.0.2.0/24"
+    az = "us-east-1b"
+    subnet_type = public
+    
+  }
 
-    egress_rules = [
-      {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-        description = "Allow all outbound traffic"
-      }
-    ]
-  } 
+  private_subnet_1 = {
 
+    public_subnet_cidr = "10.0.3.0/24"
+    az = "us-east-1a"
+    subnet_type = public
+    
+  }
+
+  private_subnet_2 = {
+    public_subnet_cidr = "10.0.4.0/24"
+    az = "us-east-1b"
+    subnet_type = public
+    
+  }
+
+  database_subnet_1 = {
+
+    public_subnet_cidr = "10.0.5.0/24"
+    az = "us-east-1a"
+    subnet_type = public
+    
+  }
+
+  database_subnet_2 = {
+    public_subnet_cidr = "10.0.6.0/24"
+    az = "us-east-1b"
+    subnet_type = public
+    
+  }
 }
 
+enable_nat_gateway  = true
+
+nat_gateway_strategy = "single"
