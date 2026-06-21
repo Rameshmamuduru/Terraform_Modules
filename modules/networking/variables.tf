@@ -7,7 +7,7 @@ variable "subnets" {
     type = map(object({
       cidr_block = string
       az = string
-      subnet_type = bool
+      subnet_type = string
 
     }))
 
