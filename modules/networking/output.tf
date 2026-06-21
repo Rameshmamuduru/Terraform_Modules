@@ -2,14 +2,29 @@ output "vpc_id" {
   value = aws_vpc.this.id
 }
 
-output "public_subnet_ids" {
-  value = [for subnet in aws_subnet.public : subnet.id]
+output "public_subnets_by_az" {
+
+  value = {
+    for k, v in aws_subnet.this :
+    var.subnets[k].az => v.id
+    if var.subnets[k].subnet_type == "public"
+  }
 }
 
-output "private_subnet_ids" {
-  value = [for subnet in aws_subnet.private : subnet.id]
+output "private_subnets_by_az" {
+
+  value = {
+    for k, v in aws_subnet.this :
+    var.subnets[k].az => v.id
+    if var.subnets[k].subnet_type == "private"
+  }
 }
 
-output "database_subnet_ids" {
-  value = [for subnet in aws_subnet.database : subnet.id]
+output "database_subnets_by_az" {
+
+  value = {
+    for k, v in aws_subnet.this :
+    var.subnets[k].az => v.id
+    if var.subnets[k].subnet_type == "database"
+  }
 }

@@ -1,3 +1,5 @@
+## vpc resouce block
+
 resource "aws_vpc" "this" {
     cidr_block = var.vpc_cidr
     enable_dns_support = true
@@ -8,114 +10,66 @@ resource "aws_vpc" "this" {
   
 }
 
-resource "aws_subnet" "public" {
-    for_each = local.public_subnet
-    
+## subnet resource block
+
+resource "aws_subnet" "this" {
+    for_each = var.subnets
+
     vpc_id = aws_vpc.this.id
-    cidr_block = each.value
-    availability_zone = each.key
-    map_public_ip_on_launch = true
-    tags = {
-        Name = "public-subnet-${each.key}"
-    }
-  
+    cidr_block = each.value.cidr_block
+    availability_zone = each.value.az
+
+    map_public_ip_on_launch = (
+        each.value.subnet_type == "public"
+    )
+     
 }
 
-resource "aws_subnet" "private" {
-    for_each = local.private_subnet
-    
-    vpc_id = aws_vpc.this.id
-    cidr_block = each.value
-    availability_zone = each.key
-    map_public_ip_on_launch = false
-    tags = {
-        Name = "private-subnet-${each.key}"
-    }
-  
-}
 
-resource "aws_subnet" "database" {
-    for_each = local.database_subnet
-    
-    vpc_id = aws_vpc.this.id
-    cidr_block = each.value
-    availability_zone = each.key
-    map_public_ip_on_launch = false
-    tags = {
-        Name = "database-subnet-${each.key}"
-    }
-  
-}
+## Internet gate way and NAT gate way
 
-## Internet Gateway
 resource "aws_internet_gateway" "this" {
     vpc_id = aws_vpc.this.id
-    tags = {
-        Name = "main-igw"
+  
+}
+
+locals {
+  public_subnet_ids = [
+    for key, subnet in aws_subnet.this :
+    subnet.id if subnet.map_public_ip_on_launch == true
+  ]
+
+  nat_gateway_subnets = (
+    var.nat_gateway_startagy == "single" ?
+    {
+        nat1 = local.public_subnet_ids[0]
+    } :
+    {
+        for idx, subnet_id in local.public_subnet_ids :
+        "nat${idx + 1}" => subnet_id
     }
+)
 }
 
 resource "aws_eip" "nat" {
-    for_each = var.nat_type == "single" ? { (var.single_nat_az) = local.public_subnet[var.single_nat_az] } : local.public_subnet
+    for_each = (
+        var.enable_nat_gateway ? local.nat_gateway_subnets : {}
+    )
 
     domain = "vpc"
-
-    tags = {
-        Name = "nat-eip-${each.key}"
-    }   
+  
 }
 
 resource "aws_nat_gateway" "this" {
-    for_each = var.nat_type == "single" ? { (var.single_nat_az) = local.public_subnet[var.single_nat_az] } : { for idx, az in var.azs : az => local.public_subnet[az] }
+    for_each =(
+        var.enable_nat_gateway ? local.nat_gateway_subnets : {}
+    ) 
 
-    allocation_id = aws_eip.nat[each.key].id
-    subnet_id = aws_subnet.public[each.key].id
-    tags = {
-        Name = "nat-gateway-${each.key}"
-    }
+    allocation_id = aws_eip.nat[each.key].subnet_id
+    subnet_id = each.value
+
+    depends_on = [
+    aws_internet_gateway.this
+  ]
   
-}
-
-## Public and private Routes
-
-resource "aws_route_table" "public" {
-    vpc_id = aws_vpc.this.id
-    tags = {
-        Name = "public-rt"
-    }
-
-    route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internet_gateway.this.id
-    }
-  
-}
-
-resource "aws_route_table_association" "public" {
-    for_each = aws_subnet.public
-
-    subnet_id = each.value.id
-    route_table_id = aws_route_table.public.id
-  
-}
-
-resource "aws_route_table" "private" {
-    for_each = aws_subnet.private
-
-    vpc_id = aws_vpc.this.id
-    tags = {
-        Name = "private-rt-${each.key}"
-    }
-
-    route {
-        cidr_block = "0.0.0.0/0"
-        nat_gateway_id = aws_nat_gateway.this[each.key].id
-    }
-}
-
-resource "aws_route_table_association" "private" {
-    for_each = aws_subnet.private
-
-    subnet_id = each.value.id
-    route_table_id = aws_route_table.private[each.key].id
 }

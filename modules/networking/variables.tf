@@ -3,67 +3,55 @@ variable "vpc_cidr" {
     description = "CIDR block for VPC" 
 }
 
-variable "azs" {
-    type = map(string)
-    description = "List of availability zones"
-    default = {}
-}
+variable "subnets" {
+    type = map(object({
+      cidr_block = string
+      az = string
+      subnet_type = bool
 
-variable "public_subnet_cidrs" {
-    type = map(string)
-    description = "List of CIDR blocks for public subnets"
-    default = {}
+    }))
 
     validation {
-      condition = length(var.public_subnet_cidrs) == length(var.azs)
-      error_message = "public subnet CIDR must match with Number of AZs"
+      condition = alltrue([
+        for subnet in values(var.subnets) :
+        can(cidrhost(subnet.cidr, 0))
+      ])
+      error_message = "all subnet CIDR must be in valid range"
+    }
+
+    validation {
+      condition = alltrue([
+        for subnet in values(var.subnets) :
+        contains(
+          ["public", "private", "database"], lower(subnet.subnet_type)
+        )
+      ])
+      error_message = "subnet type must be in public, private or database"
     }
 }
 
-variable "private_subnet_cidrs" {
-    type = map(string)
-    description = "List of CIDR blocks for private subnets"
-    default = {}
+## IGW and NAT variables
 
-    validation {
-      condition = length(var.private_subnet_cidrs) == length(var.azs)
-      error_message = "private subnet CIDR must match with Number of AZs"
-    }
+variable "enable_nat_gateway" {
+
+  description = "Enable NAT for PROD, in all the azs"
+  type = bool
+  default = true
+  
 }
 
-variable "database_subnet_cidrs" {
-    type = map(string)
-    description = "List of CIDR blocks for database subnets"
-    default = {}
+variable "nat_gateway_startagy" {
 
-    validation {
-      condition = (
-        length(var.database_subnet_cidrs) == 0 || length(var.database_subnet_cidrs) == length(var.azs)
-
-      )
-      error_message = "database subnet CIDR must match with Number of AZs"
-    }
-}
-
-
-variable "nat_type" {
+  description = "single or one_per_az"
   type = string
-  description = "NAT deployment type: Single or Multi"
+  default = "single"
 
   validation {
-    condition = contains(["single", "multi"], var.nat_type)
-    error_message = "nat_type must be single or multi"
-  }
-}
-
-variable "single_nat_az" {
-  type = string
-  default = "null"
-
-  validation {
-    condition = (
-        var.single_nat_az == null || contains (var.azs, var.single_nat_az)
+    condition = contains(
+      ["single", "one_per_az"], var.nat_gateway_stratagy
     )
-    error_message = "single nat must exsist in azs"
+
+    error_message = "allowed values are single or one_per_az"
   }
+  
 }
