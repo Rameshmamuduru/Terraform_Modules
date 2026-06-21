@@ -14,7 +14,7 @@ variable "subnets" {
     validation {
       condition = alltrue([
         for subnet in values(var.subnets) :
-        can(cidrhost(subnet.cidr, 0))
+        can(cidrnetmask(subnet.cidr_block))
       ])
       error_message = "all subnet CIDR must be in valid range"
     }
