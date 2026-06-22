@@ -1,33 +1,111 @@
 resource "aws_security_group" "this" {
 
-    name = var.name
-    description = var.description
-    vpc_id = var.vpc_id
+  name        = var.name
 
-    tags = {
-        Name = var.name
-    }
+  description = var.description
 
-    dynamic "ingress" {
-      for_each = var.ingress_rules
-      content {
-        from_port   = ingress.value.from_port
-        to_port     = ingress.value.to_port
-        protocol    = ingress.value.protocol
-        cidr_blocks = ingress.value.cidr_blocks
-        description = ingress.value.description
-      }
-    }
+  vpc_id = var.vpc_id
 
-    dynamic "egress" {
-      for_each = var.egress_rules
-      content {
-        from_port   = egress.value.from_port
-        to_port     = egress.value.to_port
-        protocol    = egress.value.protocol
-        cidr_blocks = egress.value.cidr_blocks
-        description = egress.value.description
-      }
+  tags = merge(
+    var.tags,
+    {
+      Name = var.name
     }
-  
+  )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "cidr" {
+
+  for_each = {
+
+    for rule in local.ingress_cidr_rules :
+
+    rule.key => rule
+
+  }
+
+  security_group_id = aws_security_group.this.id
+
+  description = each.value.description
+
+  from_port = each.value.from_port
+
+  to_port = each.value.to_port
+
+  ip_protocol = each.value.protocol
+
+  cidr_ipv4 = each.value.cidr
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sg" {
+
+  for_each = {
+
+    for idx, rule in var.ingress_rules :
+
+    idx => rule
+
+    if try(rule.source_security_group_id, null) != null
+
+  }
+
+  security_group_id = aws_security_group.this.id
+
+  description = each.value.description
+
+  from_port = each.value.from_port
+
+  to_port = each.value.to_port
+
+  ip_protocol = each.value.protocol
+
+  referenced_security_group_id = each.value.source_security_group_id
+}
+
+resource "aws_vpc_security_group_egress_rule" "cidr" {
+
+  for_each = {
+
+    for rule in local.egress_cidr_rules :
+
+    rule.key => rule
+
+  }
+
+  security_group_id = aws_security_group.this.id
+
+  description = each.value.description
+
+  from_port = each.value.from_port
+
+  to_port = each.value.to_port
+
+  ip_protocol = each.value.protocol
+
+  cidr_ipv4 = each.value.cidr
+}
+
+resource "aws_vpc_security_group_egress_rule" "sg" {
+
+  for_each = {
+
+    for idx, rule in var.egress_rules :
+
+    idx => rule
+
+    if try(rule.destination_security_group_id, null) != null
+
+  }
+
+  security_group_id = aws_security_group.this.id
+
+  description = each.value.description
+
+  from_port = each.value.from_port
+
+  to_port = each.value.to_port
+
+  ip_protocol = each.value.protocol
+
+  referenced_security_group_id = each.value.destination_security_group_id
 }

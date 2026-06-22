@@ -1,43 +1,66 @@
 variable "name" {
-  type        = string
   description = "Security Group Name"
+  type        = string
 }
 
 variable "description" {
-  type        = string
   description = "Security Group Description"
+  type        = string
 }
 
 variable "vpc_id" {
-  type        = string
   description = "VPC ID"
+  type        = string
+}
+
+variable "tags" {
+  description = "Common Tags"
+  type        = map(string)
+  default     = {}
 }
 
 variable "ingress_rules" {
+
+  description = "Ingress Rules"
+
   type = list(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
+
     description = string
+
+    from_port = number
+
+    to_port = number
+
+    protocol = string
+
+    cidr_blocks = optional(list(string), [])
+
+    source_security_group_id = optional(string)
+
   }))
 
   default = []
 }
 
 variable "egress_rules" {
+
+  description = "Egress Rules"
+
   type = list(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
+
     description = string
+
+    from_port = number
+
+    to_port = number
+
+    protocol = string
+
+    cidr_blocks = optional(list(string), [])
+
+    destination_security_group_id = optional(string)
+
   }))
 
   default = []
-}
-
-variable "tags" {
-  type    = map(string)
-  default = {}
 }
