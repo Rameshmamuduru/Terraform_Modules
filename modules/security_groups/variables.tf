@@ -23,7 +23,7 @@ variable "ingress_rules" {
 
   description = "Ingress Rules"
 
-  type = list(object({
+  type = map(object({
 
     description = string
 
@@ -39,14 +39,14 @@ variable "ingress_rules" {
 
   }))
 
-  default = []
+  default ={}
 }
 
 variable "egress_rules" {
 
   description = "Egress Rules"
 
-  type = list(object({
+  type = map(object({
 
     description = string
 
@@ -62,5 +62,5 @@ variable "egress_rules" {
 
   }))
 
-  default = []
+  default = {}
 }

@@ -41,9 +41,9 @@ resource "aws_vpc_security_group_ingress_rule" "sg" {
 
   for_each = {
 
-    for idx, rule in var.ingress_rules :
+    for rule_name, rule in var.ingress_rules :
 
-    idx => rule
+    rule_name => rule
 
     if try(rule.source_security_group_id, null) != null
 
@@ -84,14 +84,13 @@ resource "aws_vpc_security_group_egress_rule" "cidr" {
 
   cidr_ipv4 = each.value.cidr
 }
-
 resource "aws_vpc_security_group_egress_rule" "sg" {
 
   for_each = {
 
-    for idx, rule in var.egress_rules :
+    for rule_name, rule in var.egress_rules :
 
-    idx => rule
+    rule_name => rule
 
     if try(rule.destination_security_group_id, null) != null
 

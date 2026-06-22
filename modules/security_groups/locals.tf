@@ -2,11 +2,11 @@ locals {
 
   ingress_cidr_rules = flatten([
 
-    for rule_index, rule in var.ingress_rules : [
+    for rule_name, rule in var.ingress_rules : [
 
       for cidr in rule.cidr_blocks : {
 
-        key = "${rule_index}-${cidr}"
+        key = "${rule_name}-${replace(cidr, "/", "-")}"
 
         description = rule.description
 
@@ -26,11 +26,11 @@ locals {
 
   egress_cidr_rules = flatten([
 
-    for rule_index, rule in var.egress_rules : [
+    for rule_name, rule in var.egress_rules : [
 
       for cidr in rule.cidr_blocks : {
 
-        key = "${rule_index}-${cidr}"
+        key = "${rule_name}-${replace(cidr, "/", "-")}"
 
         description = rule.description
 
