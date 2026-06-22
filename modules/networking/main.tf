@@ -1,6 +1,4 @@
-####################################
 # VPC
-####################################
 
 resource "aws_vpc" "this" {
 
@@ -13,9 +11,7 @@ resource "aws_vpc" "this" {
   }
 }
 
-####################################
 # Subnets
-####################################
 
 resource "aws_subnet" "this" {
 
@@ -34,9 +30,7 @@ resource "aws_subnet" "this" {
   }
 }
 
-####################################
-# Internet Gateway
-####################################
+# Internet Gate Way
 
 resource "aws_internet_gateway" "this" {
 
@@ -47,9 +41,7 @@ resource "aws_internet_gateway" "this" {
   }
 }
 
-####################################
 # Elastic IP
-####################################
 
 resource "aws_eip" "nat" {
 
@@ -66,9 +58,7 @@ resource "aws_eip" "nat" {
   }
 }
 
-####################################
-# NAT Gateway
-####################################
+# NAT gateway
 
 resource "aws_nat_gateway" "this" {
 
@@ -90,9 +80,7 @@ resource "aws_nat_gateway" "this" {
   }
 }
 
-####################################
-# Public Route Table
-####################################
+# public route table
 
 resource "aws_route_table" "public" {
 
@@ -123,9 +111,8 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-####################################
+
 # Private Route Tables
-####################################
 
 resource "aws_route_table" "private" {
 
@@ -163,9 +150,8 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[each.key].id
 }
 
-####################################
+
 # Database Route Tables
-####################################
 
 resource "aws_route_table" "database" {
 
