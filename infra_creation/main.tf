@@ -13,7 +13,7 @@ module "security_groups" {
 
   for_each = var.security_groups
 
-  source = "../../modules/security-group"
+  source = "../modules/security_groups"
 
   name = each.key
 
