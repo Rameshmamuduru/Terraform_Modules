@@ -44,6 +44,10 @@ subnets = {
 
 }
 
+name = "test"
+description = "description"
+
+
 security_groups = {
 
   alb-sg = {
