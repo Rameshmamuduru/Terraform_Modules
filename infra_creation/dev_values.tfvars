@@ -54,6 +54,7 @@ security_groups = {
     description = "External Load Balancer"
 
     ingress_rules = {
+
       http = {
 
         description = "Allow HTTP from Internet"
@@ -81,8 +82,9 @@ security_groups = {
           "0.0.0.0/0"
         ]
       }
+    }
 
-      egress_rules = {
+    egress_rules = {
 
       backend = {
 
@@ -98,8 +100,6 @@ security_groups = {
         ]
       }
     }
-  }
-
   }
 
 }
