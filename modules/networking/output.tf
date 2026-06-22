@@ -3,28 +3,13 @@ output "vpc_id" {
 }
 
 output "public_subnets_by_az" {
-
-  value = {
-    for k, v in aws_subnet.this :
-    var.subnets[k].az => v.id
-    if var.subnets[k].subnet_type == "public"
-  }
+  value = local.public_subnet_by_az
 }
 
 output "private_subnets_by_az" {
-
-  value = {
-    for k, v in aws_subnet.this :
-    var.subnets[k].az => v.id
-    if var.subnets[k].subnet_type == "private"
-  }
+  value = local.private_subnet_by_az
 }
 
 output "database_subnets_by_az" {
-
-  value = {
-    for k, v in aws_subnet.this :
-    var.subnets[k].az => v.id
-    if var.subnets[k].subnet_type == "database"
-  }
+  value = local.database_subnet_by_az
 }
