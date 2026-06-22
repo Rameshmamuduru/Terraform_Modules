@@ -22,7 +22,7 @@ output "security_group_ids" {
 
     for sg_name, sg in module.security_groups :
 
-    sg_name => sg.id
+    sg_name => sg.security_group_id
 
   }
 
