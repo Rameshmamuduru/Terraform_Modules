@@ -43,3 +43,60 @@ subnets = {
   }
 
 }
+
+security_groups = {
+
+  alb-sg = {
+
+    description = "External Load Balancer"
+
+    ingress_rules = {
+      http = {
+
+        description = "Allow HTTP from Internet"
+
+        from_port = 80
+        to_port   = 80
+
+        protocol = "tcp"
+
+        cidr_blocks = [
+          "0.0.0.0/0"
+        ]
+      }
+
+      https = {
+
+        description = "Allow HTTPS from Internet"
+
+        from_port = 443
+        to_port   = 443
+
+        protocol = "tcp"
+
+        cidr_blocks = [
+          "0.0.0.0/0"
+        ]
+      }
+
+      egress_rules = {
+
+      backend = {
+
+        description = "Traffic to Backend"
+
+        from_port = 8080
+        to_port   = 8080
+
+        protocol = "tcp"
+
+        cidr_blocks = [
+          "10.0.0.0/16"
+        ]
+      }
+    }
+  }
+
+  }
+
+}

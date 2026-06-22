@@ -13,3 +13,17 @@ output "private_subnets" {
 output "database_subnets" {
   value = module.networking.database_subnets_by_az
 }
+
+output "security_group_ids" {
+
+  description = "All Security Group IDs"
+
+  value = {
+
+    for sg_name, sg in module.security_groups :
+
+    sg_name => sg.id
+
+  }
+
+}

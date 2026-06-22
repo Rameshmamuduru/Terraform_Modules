@@ -8,3 +8,21 @@ module "networking" {
 
   subnets = var.subnets
 }
+
+module "security_groups" {
+
+  for_each = var.security_groups
+
+  source = "../../modules/security-group"
+
+  name = each.key
+
+  description = each.value.description
+
+  vpc_id = module.networking.vpc_id
+
+  ingress_rules = each.value.ingress_rules
+
+  egress_rules = each.value.egress_rules
+
+}
